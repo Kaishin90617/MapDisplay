@@ -23,14 +23,19 @@ class MapView(context: Context?) : View(context){
     private var bmp: Bitmap = BitmapFactory.decodeFile(mapPath)
     private val paint = Paint()
 
+    // padding(余白部分，地図表示に余裕を持たせる)
+    private val padding = 50f
+    private val bmpW = bmp.width  + 2*padding   // 左右に余白を入れる
+    private val bmpH = bmp.height + 2*padding   // 上下に余白を入れる
+
     // map上の表示領域の中心座標
-    private var centerX = bmp.width  / 2f
-    private var centerY = bmp.height / 2f
+    private var centerX = bmpW / 2f
+    private var centerY = bmpH / 2f
     // 画像のスケール
     private var mScaleFactor = 1f
     // 画面と地図の比率
-    private val xRatio = displaySize.x / bmp.width.toFloat()
-    private val yRatio = displaySize.y / bmp.height.toFloat()
+    private val xRatio = displaySize.x / bmpW
+    private val yRatio = displaySize.y / bmpH
     // 最大・最小スケール
     private val maxScale = max(2.5f, max(xRatio, yRatio))
     private val minScale = min(xRatio, yRatio)
@@ -89,16 +94,16 @@ class MapView(context: Context?) : View(context){
     * mapの領域外にならないように制限
     * */
     private fun setMapLimit(){
-        val leftLim   = displaySize.x / 2f / mScaleFactor
-        val topLim    = displaySize.y / 2f / mScaleFactor
-        val rightLim  = bmp.width  - displaySize.x / 2f / mScaleFactor
-        val bottomLim = bmp.height - displaySize.y / 2f / mScaleFactor
+        val leftLim   = displaySize.x / 2f / mScaleFactor - padding
+        val topLim    = displaySize.y / 2f / mScaleFactor - padding
+        val rightLim  = bmpW - padding - displaySize.x / 2f / mScaleFactor
+        val bottomLim = bmpH - padding - displaySize.y / 2f / mScaleFactor
 
         centerX =
-            if (mScaleFactor < xRatio) bmp.width / 2f
+            if (mScaleFactor < xRatio) bmpW / 2f
             else max(leftLim, min(centerX, rightLim))
         centerY =
-            if (mScaleFactor < yRatio) bmp.height / 2f
+            if (mScaleFactor < yRatio) bmpH / 2f
             else max(topLim,  min(centerY, bottomLim))
     }
 }

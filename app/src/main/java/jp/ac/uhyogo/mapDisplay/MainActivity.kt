@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity() {
         val mapList = File(mapDir).list()
 
         if (mapList!!.isNotEmpty()){
-            mapPath = "$mapDir/${mapList[1]}"
+            mapPath = "$mapDir/${mapList[0]}"
         }
     }
 }
