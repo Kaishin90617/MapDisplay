@@ -12,14 +12,14 @@ import kotlin.math.min
 
 
 class MapView(context: Context?) : View(context){
-    // 表示サイズの取得
+    // 表示画面サイズの取得
     private val displaySize = Point().also {
         (context!!.getSystemService(WINDOW_SERVICE) as WindowManager)
             .defaultDisplay
             .apply { getSize(it) }
     }
 
-    // 表示データの取得
+    // 表示mapの取得
     private var bmp: Bitmap = BitmapFactory.decodeFile(mapPath)
     private val paint = Paint()
 
@@ -28,9 +28,11 @@ class MapView(context: Context?) : View(context){
     private var centerY = bmp.height / 2f
     // 画像のスケール
     private var mScaleFactor = 1f
-    private val xRatio = displaySize.x/bmp.width.toFloat()
-    private val yRatio = displaySize.y/bmp.height.toFloat()
-    private val maxScale = max(2f, max(xRatio, yRatio))
+    // 画面と地図の比率
+    private val xRatio = displaySize.x / bmp.width.toFloat()
+    private val yRatio = displaySize.y / bmp.height.toFloat()
+    // 最大・最小スケール
+    private val maxScale = max(2.5f, max(xRatio, yRatio))
     private val minScale = min(xRatio, yRatio)
 
     // 拡大・縮小のイベントリスナー
@@ -59,7 +61,9 @@ class MapView(context: Context?) : View(context){
     private val mScaleDetector = ScaleGestureDetector(context, scaleListener)
     private val mGestureDetector = GestureDetector(context, gestureListener)
 
-    // タッチイベント
+    /*
+    * タッチイベント
+    * */
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(ev: MotionEvent): Boolean {
         mScaleDetector.onTouchEvent(ev)
@@ -67,7 +71,9 @@ class MapView(context: Context?) : View(context){
         return true
     }
 
-    // 描画（invalidateで実行出来る）
+    /*
+    * 描画（invalidateで実行出来る）
+    * */
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
 
@@ -79,20 +85,20 @@ class MapView(context: Context?) : View(context){
         canvas?.drawBitmap(bmp, displayLeft, displayTop, paint)
     }
 
+    /*
+    * mapの領域外にならないように制限
+    * */
     private fun setMapLimit(){
-        //　mapの領域外にならないように制限
-        val leftLim   = displaySize.x / mScaleFactor / 2f
-        val topLim    = displaySize.y / mScaleFactor / 2f
+        val leftLim   = displaySize.x / 2f / mScaleFactor
+        val topLim    = displaySize.y / 2f / mScaleFactor
+        val rightLim  = bmp.width  - displaySize.x / 2f / mScaleFactor
+        val bottomLim = bmp.height - displaySize.y / 2f / mScaleFactor
 
-        val rightLim  =
-            if (mScaleFactor < xRatio) displaySize.x / 2f * mScaleFactor
-            else (bmp.width - displaySize.x / 2f) * mScaleFactor
-
-        val bottomLim =
-            if (mScaleFactor < yRatio) displaySize.y / 2f * mScaleFactor
-            else (bmp.height - displaySize.y / 2f) * mScaleFactor
-
-        centerX = max(leftLim, min(centerX, rightLim))
-        centerY = max(topLim,  min(centerY, bottomLim))
+        centerX =
+            if (mScaleFactor < xRatio) bmp.width / 2f
+            else max(leftLim, min(centerX, rightLim))
+        centerY =
+            if (mScaleFactor < yRatio) bmp.height / 2f
+            else max(topLim,  min(centerY, bottomLim))
     }
 }

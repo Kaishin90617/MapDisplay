@@ -33,13 +33,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    //　mapパスの読み込み
+    /*
+    * mapパスの読み込み
+    * */
     private fun setMapPath() {
         val mapDir  = getExternalFilesDir("map").toString()
         val mapList = File(mapDir).list()
 
         if (mapList!!.isNotEmpty()){
-            mapPath = "$mapDir/${mapList[0]}"
+            mapPath = "$mapDir/${mapList[1]}"
         }
     }
 }
